@@ -126,7 +126,7 @@ namespace PreviousDevelopmentToRefactor.Environments
         }
 
         public IEnumerable<ObjectId> CropEntitiesWithBoundary(IEnumerable<ObjectId> objectIds, Curve boundary,
-            WhichSideToKeep whichSideToKeep)
+            WhichSideToKeep whichSideToKeep, Dictionary<ObjectId, List<Point3d>> intersectionDic = null)
         {
             IEnumerable<ObjectId> result = new List<ObjectId>();
             foreach (var id in objectIds)
@@ -135,7 +135,7 @@ namespace PreviousDevelopmentToRefactor.Environments
                 if (!(dbObj is Entity)) continue;
                 var ent = dbObj as Entity;
                 //                CurEditorHelper.WriteMessage($"\n{dbObj.GetType().Name}:{dbObj.Id.ToString()}");
-                var cropper = EntityCropper<Entity>.NewEntityCropper(ent, boundary, whichSideToKeep, this);
+                var cropper = EntityCropper<Entity>.NewEntityCropper(ent, boundary, whichSideToKeep, this, intersectionDic);
                 if (cropper == null) break;
                 result.Concat(cropper.Crop());
             }

@@ -6,10 +6,13 @@ using PreviousDevelopmentToRefactor.Environments;
 
 namespace PreviousDevelopmentToRefactor.Cropper
 {
+    /// <summary>
+    /// 曲线裁剪器
+    /// </summary>
     internal class CurveCropper : EntityCropper<Curve>
     {
-        public CurveCropper(Curve entity, Curve boundary, WhichSideToKeep whichSideToKeep,
-            CommandTransBase commandTransBase) : base(entity, boundary, whichSideToKeep, commandTransBase)
+        public CurveCropper(Curve entity, Curve boundary, WhichSideToKeep whichSideToKeep, CommandTransBase commandTransBase, List<Point3d> intersects = null)
+            : base(entity, boundary, whichSideToKeep, commandTransBase, intersects)
         {
         }
 
@@ -22,12 +25,19 @@ namespace PreviousDevelopmentToRefactor.Cropper
                 foreach (var obj in objs)
                 {
                     var curve = obj as Curve;
-                    var pt = curve.GetCurveMidPoint();
-                    if (_boundary.GetPointContainment(pt) == PointContainment.OnBoundary ||
-                        _boundary.GetPointContainment(pt).ToString() == _whichSideToKeepString)
+                    try
                     {
-                        segmentsToKeep.Add(curve);
-                        segmentIdsToKeep.Add(curve.Id);
+                        var midPt = curve.GetCurveMidPoint();
+                        if (_boundary.GetPointContainment(midPt) == PointContainment.OnBoundary ||
+                            _boundary.GetPointContainment(midPt).ToString() == _whichSideToKeepString)
+                        {
+                            segmentsToKeep.Add(curve);
+                            segmentIdsToKeep.Add(curve.Id);
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        continue;
                     }
                 }
 

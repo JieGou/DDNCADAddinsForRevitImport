@@ -86,25 +86,39 @@ namespace PreviousDevelopmentToRefactor.Environments
 
         public static Point3d GetCurveMidPoint(this Curve curve)
         {
-            return curve.GetPointAtParameter((curve.EndParam + curve.StartParam) / 2);
+            try
+            {
+                return curve.GetPointAtParameter((curve.EndParam + curve.StartParam) / 2);
+            }
+            catch (System.Exception ex)
+            {
+                return curve.GetPointAtParameter(0.5);
+            }
         }
 
         public static DBObjectCollection GetSortedSplitCurves(this Curve curve, Point3dCollection pt3dCollection)
         {
-            var ptCount = pt3dCollection.Count;
-            var paraArr = new double[ptCount];
-            for (var i = 0; i < ptCount; i++) paraArr[i] = curve.GetParameterAtPoint(pt3dCollection[i]);
+            try
+            {
+                var ptCount = pt3dCollection.Count;
+                var paraArr = new double[ptCount];
+                for (var i = 0; i < ptCount; i++) paraArr[i] = curve.GetParameterAtPoint(curve.GetClosestPointTo(pt3dCollection[i], false));
 
-            Array.Sort(paraArr);
-            return curve.GetSplitCurves(new DoubleCollection(paraArr));
+                Array.Sort(paraArr);
+                return curve.GetSplitCurves(new DoubleCollection(paraArr));
+            }
+            catch (System.Exception ex)
+            {
+                return new DBObjectCollection();
+            }
         }
-//        public static DBObjectCollection GetSortedSplitCurves(this Spline spline, Point3dCollection pt3dCollection)
-//        {
-//            Curve curve = spline.ToPolyline();
-//            DBObjectCollection result = curve.GetSortedSplitCurves(pt3dCollection);
-//            curve.Dispose();
-//            return result;
-//        }
+        //        public static DBObjectCollection GetSortedSplitCurves(this Spline spline, Point3dCollection pt3dCollection)
+        //        {
+        //            Curve curve = spline.ToPolyline();
+        //            DBObjectCollection result = curve.GetSortedSplitCurves(pt3dCollection);
+        //            curve.Dispose();
+        //            return result;
+        //        }
 
         public static Point3dCollection IntersectWith(this Entity ent1, Entity ent2)
         {
